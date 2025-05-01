@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Generate & View Timetable{% endblock %}
+
+{% block content %}
+    <h1>Generate & View Timetable</h1>
+
+    <div class="card">
+        <div class="card-header">
+            <span><i class="fas fa-filter"></i> Select Semester & Section</span>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('generate_view_timetable') }}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="semester">Semester:</label>
+                        <select name="semester" id="semester" required>
+                            <option value="">-- Select Semester --</option>
+                            {% for i in range(1, 11) %}
+                                <option value="{{ i }}" {% if selected_semester == i %}selected{% endif %}>Semester {{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="section">Section:</label>
+                        <select name="section" id="section" required>
+                             <option value="">-- Select Section --</option>
+                            <option value="A" {% if selected_section == 'A' %}selected{% endif %}>Section A</option>
+                            <option value="B" {% if selected_section == 'B' %}selected{% endif %}>Section B</option>
+                        </select>
+                    </div>
+                </div>
+                 <div class="btn-group">
+                     {# Add name="action" to differentiate buttons if needed #}
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-cogs"></i> Generate/View Timetable</button>
+                 </div>
+            </form>
+        </div>
+    </div>
+
+    {# --- Display Area for Timetable --- #}
+    {% if timetable_data %}
+        <div class="card" id="timetableDisplayCard">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                 <span><i class="fas fa-table"></i> Timetable for Semester {{ selected_semester }} - Section {{ selected_section }}</span>
+                 {# Add Download button here if needed, linking to a modified download route #}
+                 <a href="{{ url_for('download_timetable', semester=selected_semester, section=selected_section) }}" class="btn btn-success btn-sm"><i class="fas fa-download"></i> Download PDF</a>
+            </div>
+            <div class="card-body">
+                <div class="timetable-grid-container">
+                    <table class="timetable-grid">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                {% for day in days %}
+                                    <th>{{ day }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for interval in time_intervals %}
+                                <tr>
+                                    <td class="time-slot">{{ interval }}</td>
+                                    {% for day in days %}
+                                        <td class="timetable-cell">
+                                            <div class="cell-content">
+                                                {{ timetable_data.get((day, interval), '') | safe }} {# Display data passed from backend #}
+                                            </div>
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                 {# Optionally add PDF iframe preview here if desired #}
+            </div>
+        </div>
+    {% elif generation_attempted %}
+         <div class="card">
+             <div class="card-body">
+                 <p class="message error">Failed to generate timetable for Semester {{ selected_semester }} - Section {{ selected_section }}. Constraints might be too strict or data might be insufficient.</p>
+             </div>
+         </div>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Timetable - Sem {{ semester }} Sec {{ section }}{% endblock %}
+
+{% block content %}
+    <h1>Timetable - Semester {{ semester }} Section {{ section }}</h1>
+
+    <div class="action-bar">
+        {# Correct link back to the main generate/view page #}
+        <a href="{{ url_for('generate_view_timetable') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Generate/View</a>
+        {% if pdf_exists %}
+            <a href="{{ url_for('download_timetable', semester=semester, section=section) }}" class="btn btn-success"><i class="fas fa-download"></i> Download PDF</a>
+        {% endif %}
+    </div>
+
+    {% if not pdf_exists %}
+         <p class="message warning">No generated timetable data found for Semester {{ semester }}, Section {{ section }}.</p>
+    {% else %}
+        <h2>Timetable Grid</h2>
+        <div class="table-container"> {# Added container for responsiveness #}
+            <table class="timetable-grid">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        {% for day in days %}
+                            <th>{{ day }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for interval in time_intervals %}
+                        <tr>
+                            <td class="time-slot" data-label="Time">{{ interval }}</td> {# Added data-label #}
+                            {% for day in days %}
+                                <td class="timetable-cell" data-label="{{ day }}"> {# Added data-label #}
+                                    <div class="cell-content">
+                                        {{ schedule.get((day, interval), '') | safe }} {# Room number is already included in the string from app.py #}
+                                    </div>
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# Removed hr for cleaner look consistent with base #}
+
+        <h2>PDF Preview</h2>
+        {% if pdf_preview_url %}
+            <iframe src="{{ pdf_preview_url }}" width="100%" height="600px" style="border: 1px solid #ccc;">
+                Your browser does not support PDFs. Please <a href="{{ url_for('download_timetable', semester=semester, section=section) }}">download the PDF</a> to view it.
+            </iframe>
+        {% else %}
+            <p class="message error">Could not generate PDF preview.</p>
+        {% endif %}
+    {% endif %}
+
+{% endblock %}

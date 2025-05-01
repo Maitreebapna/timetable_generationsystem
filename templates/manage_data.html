@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Data{% endblock %}
+
+{% block content %}
+    <h1>Manage Timetable Data</h1>
+    <p>Add or remove faculty, subjects, and semester assignments.</p>
+
+    <hr>
+
+    <div class="manage-section">
+        <h2>Manage Faculty</h2>
+        <form action="{{ url_for('add_faculty_route') }}" method="post" class="inline-form">
+            <label for="faculty_name">New Faculty Name:</label>
+            <input type="text" id="faculty_name" name="faculty_name" required>
+            <button type="submit">Add Faculty</button>
+        </form>
+        <h4>Existing Faculty:</h4>
+        <ul>
+            {% for f in faculty %}
+                <li>{{ f.faculty_name }} (ID: {{ f.faculty_id }})</li>
+            {% else %}
+                <li>No faculty found.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <hr>
+
+    <div class="manage-section">
+        <h2>Manage Subjects</h2>
+        <form action="{{ url_for('add_subject_route') }}" method="post" class="inline-form">
+             <label for="subject_code">New Subject Code:</label>
+             <input type="text" id="subject_code" name="subject_code" required placeholder="e.g., CS101">
+            <label for="subject_name">New Subject Name:</label>
+            <input type="text" id="subject_name" name="subject_name" required placeholder="e.g., C Programming">
+            <button type="submit">Add Subject</button>
+        </form>
+        <h4>Existing Subjects:</h4>
+        <ul>
+            {% for s in subjects %}
+                <li>{{ s.subject_code }} - {{ s.subject_name }} (ID: {{ s.subject_id }})</li>
+            {% else %}
+                <li>No subjects found.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <hr>
+
+    <div class="manage-section">
+        <h2>Manage Semester/Subject Assignments</h2>
+        <form action="{{ url_for('add_assignment_route') }}" method="post">
+            <div class="form-group">
+                <label for="semester">Semester:</label>
+                <select id="semester" name="semester" required>
+                    {% for i in range(1, 11) %}
+                        <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="section">Section:</label>
+                <select id="section" name="section" required>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="subject_id">Subject:</label>
+                <select id="subject_id" name="subject_id" required>
+                    <option value="">-- Select Subject --</option>
+                    {% for s in subjects %}
+                        <option value="{{ s.subject_id }}">{{ s.subject_code }} - {{ s.subject_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="faculty_id">Faculty:</label>
+                <select id="faculty_id" name="faculty_id" required>
+                     <option value="">-- Select Faculty --</option>
+                    {% for f in faculty %}
+                        <option value="{{ f.faculty_id }}">{{ f.faculty_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit">Add Assignment</button>
+        </form>
+
+        <h4>Current Assignments:</h4>
+        <div class="assignment-list">
+            {% if assignments %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Semester</th>
+                        <th>Section</th>
+                        <th>Subject</th>
+                        <th>Faculty</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for assign in assignments %}
+                    <tr>
+                        <td>{{ assign.semester }}</td>
+                        <td>{{ assign.section }}</td>
+                        <td>{{ assign.subject_name }}</td>
+                        <td>{{ assign.faculty_name }}</td>
+                        <td>
+                            <form action="{{ url_for('delete_assignment_route', assignment_id=assign.assignment_id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="button-delete" onclick="return confirm('Are you sure you want to delete this assignment?');">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p>No semester/subject assignments found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="manage-section">
+        <h2>Manage Rooms</h2>
+        <form action="{{ url_for('add_room_route') }}" method="post" class="inline-form">
+            <label for="room_number">New Room Number:</label>
+            <input type="text" id="room_number" name="room_number" required>
+            <button type="submit">Add Room</button>
+        </form>
+        <h4>Existing Rooms:</h4>
+        <ul>
+            {% for r in rooms %}
+                <li>{{ r.room_number }} (ID: {{ r.room_id }})</li>
+            {% else %}
+                <li>No rooms found.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <hr>
+
+     <div class="manage-section">
+        <h2>Database Management</h2>
+        <form action="{{ url_for('reset_database_route') }}" method="post">
+             <p>Reset the database to its initial state (including sample data for all semesters). <strong>Warning: All current data, including generated timetables, will be lost.</strong></p>
+            <button type="submit" class="button-danger" onclick="return confirm('Are you absolutely sure you want to reset the database? All data will be lost.');">Reset Database</button>
+        </form>
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Generated Timetables{% endblock %}
+
+{% block content %}
+    <h1>Generated Timetables</h1>
+    <p>The following timetables have been successfully generated and saved:</p>
+
+    {% if generated_list %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Semester</th>
+                        <th>Section</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in generated_list %}
+                    <tr>
+                        <td data-label="Semester">{{ item.semester }}</td>
+                        <td data-label="Section">{{ item.section }}</td>
+                        <td data-label="Action" class="action-cell">
+                            {# Correct link to view the specific timetable using the new endpoint name #}
+                            <a href="{{ url_for('display_single_timetable', semester=item.semester, section=item.section) }}" class="btn btn-sm btn-primary" title="View Timetable">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            {# Add Download button #}
+                            <a href="{{ url_for('download_timetable', semester=item.semester, section=item.section) }}" class="btn btn-sm btn-success" title="Download PDF">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                            {# Optional: Add delete button for specific timetable if needed #}
+                            {# <form action="{{ url_for('delete_timetable_section_route', semester=item.semester, section=item.section) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete timetable for Sem {{ item.semester }} Sec {{ item.section }}?');">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form> #}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="message info">No timetables have been generated yet.</p>
+    {% endif %}
+
+    <div class="action-bar" style="margin-top: 2rem;">
+         <a href="{{ url_for('generate_view_timetable') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Generate/View</a>
+    </div>
+
+{% endblock %}

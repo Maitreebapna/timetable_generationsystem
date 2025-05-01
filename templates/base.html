@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Timetable System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {# Add Font Awesome for icons if not already included globally #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav class="container"> {# Add container for alignment #}
+            <a href="{{ url_for('generate_view_timetable') }}" class="site-title"><i class="fas fa-calendar-alt"></i> Timetable System</a>
+            <div class="nav-links">
+                {# Link to home/generator page #}
+                <a href="{{ url_for('generate_view_timetable') }}"><i class="fas fa-cogs"></i> Generate/View</a>
+                {# Link to list generated timetables #}
+                <a href="{{ url_for('list_generated_timetables') }}"><i class="fas fa-list-alt"></i> View Generated</a>
+                {% if session.logged_in %}
+                    <a href="{{ url_for('manage_data') }}"><i class="fas fa-database"></i> Manage Data</a>
+                    <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> Admin Login</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+    {# Removed the first <hr> for cleaner look #}
+    <main class="container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">
+                         {% if category == 'success' %}<i class="fas fa-check-circle"></i>
+                         {% elif category == 'error' %}<i class="fas fa-exclamation-circle"></i>
+                         {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle"></i>
+                         {% else %}<i class="fas fa-info-circle"></i>
+                         {% endif %}
+                         {{ message }}
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}
+        <!-- Page-specific content will go here -->
+        {% endblock %}
+    </main>
+    {# Removed the second <hr> #}
+    <footer>
+        <p>&copy; Timetable Generation System</p>
+    </footer>
+</body>
+</html>
